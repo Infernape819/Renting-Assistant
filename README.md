@@ -1,5 +1,7 @@
 # Renting-Assistant · 合租生活管家
 
+🔗 **在线体验：https://renting-assistant.vercel.app** （Vercel 自动部署，随 main 分支更新）
+
 > Mark's Renting Assistant Demo —— 一款面向合租室友的生活协作工具，把「钱、卫生、规矩」三件事管起来。
 
 ## 这是什么
