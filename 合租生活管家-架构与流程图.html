@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>合租生活管家 · 信息架构与业务流程图 v1.0</title>
+<script src="./assets/mermaid.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
+    background: #f5f6f8;
+    color: #2b2f36;
+    line-height: 1.7;
+  }
+  header {
+    background: linear-gradient(135deg, #4f7cff 0%, #6c5ce7 100%);
+    color: #fff;
+    padding: 40px 24px 32px;
+    text-align: center;
+  }
+  header h1 { font-size: 26px; font-weight: 600; letter-spacing: 1px; }
+  header p { margin-top: 8px; font-size: 14px; opacity: .85; }
+  main { max-width: 1180px; margin: 0 auto; padding: 32px 20px 64px; }
+  section.card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 28px 28px 20px;
+    margin-bottom: 32px;
+    box-shadow: 0 2px 12px rgba(30, 40, 80, .06);
+  }
+  section.card h2 {
+    font-size: 20px;
+    margin-bottom: 4px;
+    padding-left: 12px;
+    border-left: 4px solid #4f7cff;
+  }
+  section.card .desc { color: #6b7280; font-size: 14px; margin: 8px 0 18px; }
+  .diagram {
+    overflow-x: auto;
+    text-align: center;
+    padding: 12px 0 8px;
+  }
+  .mermaid { display: inline-block; min-width: 320px; }
+  table.notes {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 18px;
+    font-size: 13.5px;
+  }
+  table.notes th, table.notes td {
+    border: 1px solid #e5e7eb;
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.notes th { background: #f0f4ff; font-weight: 600; white-space: nowrap; }
+  .tag {
+    display: inline-block; font-size: 12px; padding: 2px 10px;
+    border-radius: 999px; background: #eef2ff; color: #4f7cff;
+    margin-left: 8px; vertical-align: middle;
+  }
+  footer { text-align: center; color: #9ca3af; font-size: 12px; padding: 24px 0 40px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>合租生活管家 · 信息架构与业务流程图</h1>
+  <p>v1.0 ｜ 2026-09-12 ｜ 配套文档：《合租生活管家-功能清单-v1.0》</p>
+</header>
+
+<main>
+
+<!-- ============ 信息架构 ============ -->
+<section class="card">
+  <h2>一、产品信息架构（IA）<span class="tag">5 底部 Tab + 消息中心</span></h2>
+  <p class="desc">底部 Tab：首页 / 账单 / 清洁 / 公约 / 我的；消息中心位于首页右上角（带未读红点）；公共物品模块 v1.1 上线，挂在首页快捷区。</p>
+  <div class="diagram">
+<pre class="mermaid">
+mindmap
+  root((合租生活管家))
+    首页
+      今日卡片
+        今天谁值日
+        我的待付账单
+        待确认与待投票
+      合租日历
+        值日安排
+        缴费日与结算日
+      快捷操作
+        记一笔
+        值日打卡
+        发公告
+      公共物品 v1.1
+        物品清单
+        库存与补货提醒
+        公共采购清单
+        借用登记
+    账单
+      账单列表
+        筛选与导出
+      记一笔
+        金额类别票据
+        分摊方式
+      周期账单
+        房租宽带自动记账
+      月度结算
+        结算单
+        债务简化
+      账单详情
+        确认与异议
+        一键催款
+      统计报表
+    清洁
+      值日日历
+      排班规则
+        区域与标准
+        轮换顺序频次
+      值日打卡
+        拍照留痕
+      换班与代班
+      清洁统计
+    公约
+      室友公约
+        模板库
+        自定义条款
+        签署确认
+      修订历史
+      公告栏
+        已读未读
+      投票议事
+    我的
+      个人资料
+      我的账单
+      我的值日
+      空间管理
+        切换空间
+        退租结算
+        管理员转让
+      设置
+      意见反馈
+    消息中心
+      账单消息
+      值日提醒
+      公告投票通知
+      提醒设置
+</pre>
+  </div>
+  <table class="notes">
+    <tr><th>设计要点</th><td>①「记一笔」是全局最高频操作，首页快捷区 + 账单 Tab 悬浮按钮双入口；② 消息中心不做 Tab，避免稀释底部导航的场景心智；③ 所有页面遵循「列表 → 详情 → 操作」三层深度，不嵌套超过三级。</td></tr>
+  </table>
+</section>
+
+<!-- ============ 流程1 ============ -->
+<section class="card">
+  <h2>二、费用 AA 分摊流程<span class="tag">从垫付到结清全程留痕</span></h2>
+  <p class="desc">核心目标：App 代替人开口催款，账单确认有超时兜底，月底结算自动合并互欠。</p>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart TD
+    A["产生公共支出<br>例：室友垫付电费 200 元"] --> B["付款人「记一笔」<br>金额 / 类别 / 上传票据"]
+    B --> C{"选择分摊方式"}
+    C --> C1["全员均分"]
+    C --> C2["自定义比例 / 指定金额"]
+    C --> C3["部分成员参与<br>（出差者不参与）"]
+    C1 --> D["生成待付账单<br>自动推送通知相关室友"]
+    C2 --> D
+    C3 --> D
+    D --> E{"室友确认账单<br>（48h 超时默认确认）"}
+    E -->|"有异议"| E1["发起异议 → 协商修改"] --> B
+    E -->|"确认"| F["室友转账付款<br>可上传截图 / 标记已付"]
+    F --> G{"全部付清？"}
+    G -->|"否，临期未付"| H["付款人「一键催款」<br>委婉话术模板推送"]
+    H --> F
+    G -->|"是"| I["账单完结，留档可查"]
+    I --> J["月底触发月度结算<br>汇总全员应收应付"]
+    J --> K["债务简化<br>合并互欠，最少笔数多退少补"]
+    K --> L["生成月度结算单<br>全员确认归档"]
+
+    classDef action fill:#e8f0fe,stroke:#4f7cff,color:#1a3a8f;
+    classDef decision fill:#fef6e0,stroke:#f5a623,color:#8a5a00;
+    classDef done fill:#e7f6ec,stroke:#34a853,color:#1d6b35;
+    class B,D,F,H,J,K action;
+    class C,E,G decision;
+    class I,L done;
+</pre>
+  </div>
+  <table class="notes">
+    <tr><th>分摊方式</th><td>均分（绝对公平）/ 自定义比例（相对公平）/ 部分成员参与（出差豁免），覆盖合租主要争议场景。</td></tr>
+    <tr><th>超时默认确认</th><td>防止「装死不确认」导致账单卡死，保证流程可推进。</td></tr>
+    <tr><th>一键催款</th><td>委婉话术模板是产品的情绪价值核心：留面子、有据可查。</td></tr>
+    <tr><th>债务简化</th><td>3 人以上互欠常见，合并后每人最多转一次账。</td></tr>
+  </table>
+</section>
+
+<!-- ============ 流程2 ============ -->
+<section class="card">
+  <h2>三、清洁值日闭环<span class="tag">排班自动 + 执行留痕</span></h2>
+  <p class="desc">核心目标：排班自动化、执行可视化、异常（换班 / 未完成）有正式处理通道。</p>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart TD
+    A["户主设置清洁区域与标准<br>配置轮换规则（按周 / 顺序）"] --> B["系统自动生成排班表"]
+    B --> C["前一日：预告提醒"]
+    C --> D["当天早上：值日提醒"]
+    D --> E{"值日人当天可做？"}
+    E -->|"可以"| G["执行清洁 → 拍照打卡<br>全员可见"]
+    E -->|"临时有事"| F["发起换班 / 代班申请"]
+    F --> F1{"对方确认？"}
+    F1 -->|"确认"| F2["排班自动互换"] --> G
+    F1 -->|"拒绝"| D
+    D -->|"超时未打卡"| H["二次提醒（升级）"]
+    H --> I{"当日补做？"}
+    I -->|"是"| G
+    I -->|"否"| J["记录「未完成」<br>按公约约定条款处理"]
+    G --> K["完成留档<br>计入完成率 / 按时率统计"]
+    J --> K
+    K --> L["下一周期自动轮转"] --> B
+
+    classDef action fill:#e8f0fe,stroke:#4f7cff,color:#1a3a8f;
+    classDef decision fill:#fef6e0,stroke:#f5a623,color:#8a5a00;
+    classDef warn fill:#fdecea,stroke:#e5534b,color:#8f2218;
+    classDef done fill:#e7f6ec,stroke:#34a853,color:#1d6b35;
+    class A,B,C,D,F,F2,G,H action;
+    class E,F1,I decision;
+    class J warn;
+    class K done;
+</pre>
+  </div>
+  <table class="notes">
+    <tr><th>提醒节奏</th><td>预告 → 当天 → 超时升级，递进式而非一次性打扰。</td></tr>
+    <tr><th>换班确认</th><td>权责转移必须双方知情，避免「我以为你帮我做了」。</td></tr>
+    <tr><th>拍照打卡</th><td>留痕 + 被看见，付出可视化本身就是激励。</td></tr>
+    <tr><th>未完成处理</th><td>App 不内置惩罚，引用自家公约条款，App 只做中立的记录者。</td></tr>
+  </table>
+</section>
+
+<!-- ============ 流程3 ============ -->
+<section class="card">
+  <h2>四、退租结算流程<span class="tag">钱清 · 事交 · 权转 · 数据留</span></h2>
+  <p class="desc">核心目标：好聚好散——退租是矛盾最集中的场景，流程必须完整兜底。</p>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart TD
+    A["成员发起退租<br>设定退租日期"] --> B{"有未付账单？"}
+    B -->|"有"| C["限期结清<br>或协商转移给其他成员"]
+    C --> D{"有未收款项？"}
+    B -->|"无"| D
+    D -->|"有"| E["确认收款到账<br>退租后保留收款入口"]
+    E --> F["值日任务移交<br>剩余排班自动重排"]
+    D -->|"无"| F
+    F --> G["公共物品处置<br>个人归属物品登记处理方式<br>（带走 / 折价转让）"]
+    G --> H{"是否户主？"}
+    H -->|"是"| I["先转让管理员给其他成员"]
+    H -->|"否"| J["移出合租空间"]
+    I --> J
+    J --> K["历史数据保留（只读）<br>退租完成，好聚好散"]
+
+    classDef action fill:#e8f0fe,stroke:#4f7cff,color:#1a3a8f;
+    classDef decision fill:#fef6e0,stroke:#f5a623,color:#8a5a00;
+    classDef done fill:#e7f6ec,stroke:#34a853,color:#1d6b35;
+    class C,E,F,G,I,J action;
+    class B,D,H decision;
+    class K done;
+</pre>
+  </div>
+  <table class="notes">
+    <tr><th>未收款保留入口</th><td>「人走了钱没收回」是最高频纠纷，流程上必须兜底。</td></tr>
+    <tr><th>值日自动重排</th><td>避免人走了排班表出现「幽灵岗」。</td></tr>
+    <tr><th>物品处置登记</th><td>「那个锅是谁的」是退租经典争吵点，提前在流程里消化。</td></tr>
+    <tr><th>数据只读保留</th><td>退租者可回查历史账单，防止后续扯皮无据。</td></tr>
+  </table>
+</section>
+
+<!-- ============ 联动关系 ============ -->
+<section class="card">
+  <h2>五、三条流程的联动关系</h2>
+  <p class="desc">消息中心是横向支撑，公约是规则底座，退租是汇聚点。</p>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart LR
+    P1["流程 1<br>费用分摊"] --- MSG["消息与提醒中心<br>催款 / 提醒 / 话术"]
+    P2["流程 2<br>值日闭环"] --- MSG
+    P3["流程 3<br>退租结算"] --- MSG
+    P3 -->|"触发账单清算"| P1
+    P3 -->|"触发值日重排"| P2
+    RULE["室友公约<br>（规则底座）"] -->|"条款依据"| P1
+    RULE -->|"条款依据"| P2
+    RULE -->|"条款依据"| P3
+
+    classDef hub fill:#eef2ff,stroke:#4f7cff,color:#1a3a8f;
+    classDef rule fill:#fef6e0,stroke:#f5a623,color:#8a5a00;
+    class MSG hub;
+    class RULE rule;
+</pre>
+  </div>
+</section>
+
+</main>
+
+<footer>合租生活管家 · 产品规划文档 ｜ 图表由 Mermaid 渲染，源文件：合租生活管家-信息架构与流程图-v1.0.md</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    flowchart: { curve: 'basis', htmlLabels: true, useMaxWidth: true },
+    mindmap: { useMaxWidth: true }
+  });
+</script>
+
+</body>
+</html>

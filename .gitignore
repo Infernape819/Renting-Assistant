@@ -1,0 +1,10 @@
+# 本地工具（GitHub CLI 等，仅本机使用，不上传）
+tools/
+
+# 依赖与构建产物
+node_modules/
+dist/
+
+# 系统文件
+.DS_Store
+Thumbs.db
